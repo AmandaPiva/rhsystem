@@ -12,3 +12,86 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum TipoUsuario {
+  ADMIN
+  USUARIO
+}
+
+enum EtapasProcessoSeletivo {
+  TRIAGEM
+  ENTREVISTA
+  TESTES
+  AVALIACAO
+  CONTRATACAO
+}
+
+model Usuario {
+  id     String      @id @default(cuid())
+  nome   String?
+  email  String      @unique
+  senha  String
+  status Boolean     @default(true)
+  tipo  TipoUsuario
+}
+
+model Funcionario {
+  id          String   @id @default(cuid())
+  nome        String?
+  cpf         String?  @unique
+  rg          String?  @unique
+  celular     String?
+  email       String?  @unique
+  status      Boolean? @default(true)
+  tipo        TipoUsuario
+  setorId     String?
+  setor       Setor?   @relation(fields: [setorId], references: [id])
+  ferias     Ferias[]
+}
+
+model Setor {
+  id          String   @id @default(cuid())
+  nome        String?
+  descricao   String?
+  status      Boolean? @default(true)
+  funcionarios Funcionario[]
+  vagas       Vagas[]
+}
+
+model Vagas {
+  id          String   @id @default(cuid())
+  nome        String?
+  descricao   String?
+  status      Boolean? @default(true)
+  setorId     String?
+  setor       Setor?   @relation(fields: [setorId], references: [id])
+  candidatos  Candidatos[]
+  dataCriacao DateTime? @default(now())
+  dataFinalizacao DateTime?
+  dataEntradaDoCandidato DateTime?
+}
+
+model Candidatos {
+  id          String   @id @default(cuid())
+  nome        String?
+  cpf         String?  @unique
+  rg          String?  @unique
+  celular     String?
+  email       String?  @unique
+  status      Boolean? @default(true)
+  vagaId      String?
+  vaga        Vagas?   @relation(fields: [vagaId], references: [id])
+  etapa       EtapasProcessoSeletivo?
+}
+
+model Ferias {
+  id          String   @id @default(cuid())
+  dataInicio  DateTime?
+  dataFim     DateTime?
+  status      Boolean? @default(true)
+  funcionarioId String?
+  funcionario Funcionario? @relation(fields: [funcionarioId], references: [id])
+}
+
+
+
