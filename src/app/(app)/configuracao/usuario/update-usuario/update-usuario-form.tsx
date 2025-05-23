@@ -7,19 +7,19 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TipoUsuario } from "@prisma/client";
 import { AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"; 
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import configuracaoUpdateUsuarioAction from "@/actions/configuracao-update-usuario-action";
+import prismaBuscaUsuario from "@/server/usuario/buscar-usuario";
 
 const formSchema = z
     .object({
         nome: z.string().min(1, { message: "Nome é obrigatório" }),
         email: z.string().email({ message: "Email inválido" }),
-        senha: z.string().min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-        confirmacaoSenha: z.string().min(6, { message: "Confirmação de senha deve ter pelo menos 6 caracteres" }),
         tipoUsuario: z.enum(["ADMIN", "USUARIO"], {
             errorMap: () => ({ message: "Tipo de usuário é obrigatório" }),
         }),
@@ -31,7 +31,7 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function CriaUsuarioForm(){
+export default function CriaUsuarioForm({userId}: { userId: string }){
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -40,25 +40,45 @@ export default function CriaUsuarioForm(){
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
     })
+
+    useEffect(() => {
+        async function fetchUsuario() {
+            try{
+                const usuario = await prismaBuscaUsuario({pelo: "id", valor: userId});
+                if(usuario){
+                    form.reset({
+                        nome: usuario.nome ?? "",
+                        email: usuario.email ?? "",
+                        tipoUsuario: usuario.tipo ?? "USUARIO"
+                    })
+                } else {
+                    setError("Usuário não encontrado");
+                }
+            } catch (error) {
+                setError("Erro ao buscar usuário");
+            }
+        }
+
+        if(userId){
+            fetchUsuario();
+        }
+    }, [userId, form]);
     
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setLoading(true);
         
-        const { nome, email, senha, confirmacaoSenha } = data;
+        const { nome, email } = data;
         const tipoUser: TipoUsuario = data.tipoUsuario as TipoUsuario;
-        const funcionario = data.funcionario === "sim" ? true : false;
 
         try {
-            await configuracaoCriaUsuarioAction({
-                nome,
+            await configuracaoUpdateUsuarioAction({
+               id: userId,
+               nome,
                 email,
-                senha,
-                confirmacaoSenha,
                 status: true,
                 tipoUsuario: tipoUser,
-                funcionario,
-            });
-            console.log("Usuário criado com sucesso");
+            })
+            console.log("Usuário atualizado com sucesso");
             router.push("/configuracao/usuario");
 
         } catch (error) {
@@ -68,6 +88,7 @@ export default function CriaUsuarioForm(){
                 setError("Erro desconhecido");
             }
         } 
+        setLoading(false);
     }
 
     return(
@@ -79,7 +100,7 @@ export default function CriaUsuarioForm(){
                  {error && (
                     <Alert variant="destructive" className="mt-4 w-[400px]">
                         <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Erro ao criar usuário</AlertTitle>
+                        <AlertTitle>Erro ao atualizar usuário</AlertTitle>
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
@@ -109,30 +130,7 @@ export default function CriaUsuarioForm(){
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="senha"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                     <Input className="w-[100%] mt-5" type="password" {...field} placeholder="Senha" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="confirmacaoSenha"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                      <Input className="w-[100%] mt-5" type="password" {...field} placeholder="Confirmação de Senha" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                   
 
                     <div className=" flex flex-row mt-10 justify-center">
                             <FormField

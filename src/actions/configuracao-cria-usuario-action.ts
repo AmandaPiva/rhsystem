@@ -1,7 +1,7 @@
 "use server";
 
 import { hashSenha } from "@/lib/crypto";
-import prismaCriaUsuario from "@/server/usuario/usuario";
+import prismaCriaUsuario from "@/server/usuario/cria-usuario";
 import { TipoUsuario } from "@prisma/client";
 
 interface IConfiguracaoCriaUsuarioAction {
