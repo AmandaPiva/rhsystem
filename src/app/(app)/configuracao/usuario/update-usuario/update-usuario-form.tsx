@@ -197,7 +197,7 @@ export default function UpdateUsuarioForm({ userId }: { userId: string }) {
                   type="submit"
                   className="ml-5 bg-gray-800 cursor-pointer"
                 >
-                  Cadastrar
+                  Atualizar
                 </Button>
               </div>
             </form>

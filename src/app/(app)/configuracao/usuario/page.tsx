@@ -1,4 +1,10 @@
+"use client";
+
+import configuracaoMudaStatusUsuarioAction from "@/actions/configuracao-muda-status-usuario-action";
+import StatusSwitch from "@/components/StatusSwitch";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -11,9 +17,27 @@ import {
 import { listaUsuarios } from "@/server/usuario/lista-usuarios";
 import { Pencil, Plus, Trash } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function Usuarios() {
-  const usuarios = await listaUsuarios();
+export default function Usuarios() {
+  const [usuarios, setUsuarios] = useState<
+    {
+      id: string;
+      nome: string | null;
+      email: string;
+      status: boolean;
+      tipo: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    async function fetchUsuarios() {
+      const usuarios = await listaUsuarios();
+      setUsuarios(usuarios);
+    }
+
+    fetchUsuarios();
+  }, []);
 
   return (
     <div className="mx-auto">
@@ -26,10 +50,9 @@ export default async function Usuarios() {
 
       <div className="ml-[80%] flex flex-row gap-2 mt-10">
         <Button className="cursor-pointer bg-black text-white rounded-4xl hover:bg-indigo-900 h-10 w-10">
-          <Plus />
-        </Button>
-        <Button className="cursor-pointer bg-red-700 text-white rounded-4xl hover:bg-indigo-900 h-10 w-10">
-          <Trash />
+          <Link href="/configuracao/usuario/criar-usuario">
+            <Plus />
+          </Link>
         </Button>
       </div>
       <div className=" mt-5 flex flex-col items-center justify-center">
@@ -55,7 +78,10 @@ export default async function Usuarios() {
                     </TableCell>
                     <TableCell>{usuario.email}</TableCell>
                     <TableCell>
-                      {usuario.status ? "Ativo" : "Inativo"}
+                      <StatusSwitch
+                        userId={usuario.id}
+                        initialStatus={usuario.status}
+                      />
                     </TableCell>
                     <TableCell>
                       {usuario.tipo === "ADMIN" ? "Admin" : "Usuário"}
