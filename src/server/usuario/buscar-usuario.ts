@@ -1,4 +1,4 @@
-"use service";
+"use server";
 
 import { prisma } from "@/lib/prisma";
 import { Usuario } from "@prisma/client";

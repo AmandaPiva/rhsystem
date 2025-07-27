@@ -48,10 +48,13 @@ export default function Usuarios() {
         Gerencie os usuarios do sistema
       </p>
 
-      <div className="ml-[80%] flex flex-row gap-2 mt-10">
-        <Button className="cursor-pointer bg-black text-white rounded-4xl hover:bg-indigo-900 h-10 w-10">
+      <div className="ml-[90%] flex flex-row gap-2 mt-10">
+        <Button className="cursor-pointer bg-black text-white hover:bg-indigo-900">
           <Link href="/configuracao/usuario/criar-usuario">
-            <Plus />
+            <div className="flex items-center gap-2">
+              <Plus />
+              Novo
+            </div>
           </Link>
         </Button>
       </div>
