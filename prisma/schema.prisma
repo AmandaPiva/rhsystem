@@ -18,6 +18,11 @@ enum TipoUsuario {
   USUARIO
 }
 
+enum EstadoCivil {
+  SOLTEIRO
+  CASADO
+}
+
 enum EtapasProcessoSeletivo {
   TRIAGEM
   ENTREVISTA
@@ -43,6 +48,8 @@ model Funcionario {
   celular     String?
   email       String?  @unique
   status      Boolean? @default(true)
+  dataNascimento DateTime?
+  estadoCivil EstadoCivil?
   tipo        TipoUsuario
   setorId     String?
   setor       Setor?   @relation(fields: [setorId], references: [id])

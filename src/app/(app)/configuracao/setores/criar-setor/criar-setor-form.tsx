@@ -110,10 +110,10 @@ export default function CriarSetorForm() {
                 )}
               />
 
-              <div className=" flex flex-row mt-10 justify-center">
+              <div className=" flex flex-row justify-center">
                 <Button
                   type="submit"
-                  className="ml-5 bg-gray-800 cursor-pointer"
+                  className="mx-auto mt-8 bg-gray-800 cursor-pointer w-[70%]"
                 >
                   Cadastrar
                 </Button>

@@ -69,7 +69,10 @@ export default function Setores() {
                 <TableCell className="font-medium">{setor.nome}</TableCell>
                 <TableCell>{setor.descricao}</TableCell>
                 <TableCell>
-                  <Link href={`#`} className="cursor-pointer">
+                  <Link
+                    href={`/configuracao/setores/update-setor/${setor.id}`}
+                    className="cursor-pointer"
+                  >
                     <Pencil />
                   </Link>
                 </TableCell>
