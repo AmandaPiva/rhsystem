@@ -27,7 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, CalendarIcon } from "lucide-react";
+import { AlertCircle, CalendarIcon, ChevronDownIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -43,7 +43,7 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "CPF é obrigatório" })
     .max(16, { message: "CPF deve ter no máximo 16 caracteres" }),
-  rg: z.string().min(1, { message: "RG é obrigatório" }).max(8, {
+  rg: z.string().min(1, { message: "RG é obrigatório" }).max(12, {
     message: "RG deve ter no máximo 8 caracteres",
   }),
   dataNascimento: z.date({
@@ -70,6 +70,7 @@ export default function CriaColaboradoresForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState<Date>();
+  const [open, setOpen] = useState(false);
   const router = useRouter();
 
   const form = useForm<FormData>({
@@ -90,6 +91,7 @@ export default function CriaColaboradoresForm() {
     setError(null);
 
     try {
+      console.log("cheguei aqui");
       const colaboradorId = await configuracaoCriaColaboradorAction({
         nome: data.nome,
         cpf: data.cpf,
@@ -104,6 +106,7 @@ export default function CriaColaboradoresForm() {
       });
 
       if (colaboradorId) {
+        console.log("CRIOU");
         router.push("/configuracao/colaboradores");
       }
     } catch (err) {
@@ -202,28 +205,35 @@ export default function CriaColaboradoresForm() {
             name="dataNascimento"
             render={({ field }) => (
               <FormItem className="mt-6">
+                <Label htmlFor="date" className="px-1">
+                  Data de Nascimento
+                </Label>
                 <FormControl>
-                  <Popover>
+                  <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        data-empty={!field.value}
-                        className="data-[empty=true]:text-muted-foreground w-[30%] justify-start text-left font-normal"
+                        id="date"
+                        className="w-48 justify-between font-normal"
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {field.value
+                          ? field.value.toLocaleDateString()
+                          : "Select date"}
+                        <ChevronDownIcon />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          field.onChange(date);
+                          setOpen(false);
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -258,6 +268,29 @@ export default function CriaColaboradoresForm() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <RadioGroup
+                    onValueChange={(value) => field.onChange(value === "true")}
+                    value={field.value ? "true" : "false"}
+                    className="flex gap-4"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="true" id="true" />
+                      <Label htmlFor="ativo">Ativo</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="false" id="false" />
+                      <Label htmlFor="inativo">Inativo</Label>
+                    </div>
+                  </RadioGroup>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="celular"
@@ -306,7 +339,7 @@ export default function CriaColaboradoresForm() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="COMUM">Comum</SelectItem>
+                      <SelectItem value="USUARIO">Usuário</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

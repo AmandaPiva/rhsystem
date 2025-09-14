@@ -13,7 +13,12 @@ export async function listaColaboradores() {
       dataNascimento: true,
       estadoCivil: true,
       tipo: true,
-      setorId: true,
+      setor: {
+        select: {
+          id: true,
+          nome: true,
+        },
+      },
     },
     orderBy: {
       nome: "asc",
