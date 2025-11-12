@@ -1,7 +1,9 @@
 "use client";
 
+import StatusSwitch from "@/components/StatusSwitch";
+import StatusSwitchColaborador from "@/components/StatusSwitchColaborador";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import {
   Select,
   SelectContent,
@@ -97,7 +99,10 @@ export default function Colaboradores() {
                 <TableCell>{colaborador.email}</TableCell>
                 <TableCell>{colaborador.setor?.nome}</TableCell>
                 <TableCell>
-                  {colaborador.status ? "Ativo" : "Inativo"}
+                  <StatusSwitchColaborador
+                    colaboradorId={colaborador.id}
+                    initialStatus={colaborador.status ?? false}
+                  />
                 </TableCell>
                 <TableCell>{colaborador.tipo}</TableCell>
                 <TableCell>
