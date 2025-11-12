@@ -75,7 +75,10 @@ export default function Colaboradores() {
       </p>
 
       <div className="flex flex-row mt-20 w-[90%] mx-auto">
-        <Select>
+        <Select
+          value={selectedSetor}
+          onValueChange={(v) => setSelectedSetor(v ?? "")}
+        >
           <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Filtrar por Setor" />
           </SelectTrigger>
@@ -101,42 +104,52 @@ export default function Colaboradores() {
       </div>
 
       <div className=" mt-5 flex flex-col items-center justify-center">
-        <Table className="w-[90%] mx-auto bg-violet-100 rounded-lg">
-          <TableHeader>
-            <TableRow>
-              <TableHead className=" font-bold">Nome</TableHead>
-              <TableHead className="font-bold">E-mail</TableHead>
-              <TableHead className="font-bold">Setor</TableHead>
-              <TableHead className="font-bold">Status</TableHead>
-              <TableHead className="font-bold">Tipo</TableHead>
-              <TableHead className="font-black">Editar</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {colaboradores.map((colaborador) => (
-              <TableRow key={colaborador.id}>
-                <TableCell>{colaborador.nome}</TableCell>
-                <TableCell>{colaborador.email}</TableCell>
-                <TableCell>{colaborador.setor?.nome}</TableCell>
-                <TableCell>
-                  <StatusSwitchColaborador
-                    colaboradorId={colaborador.id}
-                    initialStatus={colaborador.status ?? false}
-                  />
-                </TableCell>
-                <TableCell>{colaborador.tipo}</TableCell>
-                <TableCell>
-                  <Link
-                    href={`/configuracao/colaboradores/update-colaborador/${colaborador.id}`}
-                    className="cursor-pointer"
-                  >
-                    <Pencil />
-                  </Link>
-                </TableCell>
+        {selectedSetor && filteredColaboradores.length === 0 ? (
+          <div className="w-[90%] mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center text-gray-700">
+            Nenhum colaborador vinculado a este setor
+          </div>
+        ) : colaboradores.length === 0 ? (
+          <div className="w-[90%] mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center text-gray-700">
+            Nenhum colaborador cadastrado
+          </div>
+        ) : (
+          <Table className="w-[90%] mx-auto bg-violet-100 rounded-lg">
+            <TableHeader>
+              <TableRow>
+                <TableHead className=" font-bold">Nome</TableHead>
+                <TableHead className="font-bold">E-mail</TableHead>
+                <TableHead className="font-bold">Setor</TableHead>
+                <TableHead className="font-bold">Status</TableHead>
+                <TableHead className="font-bold">Tipo</TableHead>
+                <TableHead className="font-black">Editar</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredColaboradores.map((colaborador) => (
+                <TableRow key={colaborador.id}>
+                  <TableCell>{colaborador.nome}</TableCell>
+                  <TableCell>{colaborador.email}</TableCell>
+                  <TableCell>{colaborador.setor?.nome ?? "-"}</TableCell>
+                  <TableCell>
+                    <StatusSwitchColaborador
+                      colaboradorId={colaborador.id}
+                      initialStatus={colaborador.status ?? false}
+                    />
+                  </TableCell>
+                  <TableCell>{colaborador.tipo}</TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/configuracao/colaboradores/update-colaborador/${colaborador.id}`}
+                      className="cursor-pointer"
+                    >
+                      <Pencil />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
