@@ -3,10 +3,10 @@
 import StatusSwitch from "@/components/StatusSwitch";
 import StatusSwitchColaborador from "@/components/StatusSwitchColaborador";
 import { Button } from "@/components/ui/button";
-
 import {
   Select,
   SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -19,8 +19,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { listaColaboradores } from "@/server/colaboradores/lista-colaboradores";
+import { listaSetores } from "@/server/setores/lista-setores";
 import { EstadoCivil, TipoUsuario } from "@prisma/client";
-import { Pencil, Plus, Trash } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -42,14 +43,27 @@ export default function Colaboradores() {
     }[]
   >([]);
 
+  const [setores, setSetores] = useState<{ id: string; nome: string | null }[]>(
+    []
+  );
+  const [selectedSetor, setSelectedSetor] = useState<string>("");
+
   useEffect(() => {
-    async function fetchColaboradores() {
-      const colaboradores = await listaColaboradores();
+    async function fetchData() {
+      const [colaboradores, setores] = await Promise.all([
+        listaColaboradores(),
+        listaSetores(),
+      ]);
       setColaboradores(colaboradores);
+      setSetores(setores);
     }
 
-    fetchColaboradores();
+    fetchData();
   }, []);
+
+  const filteredColaboradores = selectedSetor
+    ? colaboradores.filter((c) => c.setor?.id === selectedSetor)
+    : colaboradores;
 
   return (
     <div className="mx-auto">
@@ -65,7 +79,13 @@ export default function Colaboradores() {
           <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Filtrar por Setor" />
           </SelectTrigger>
-          <SelectContent></SelectContent>
+          <SelectContent>
+            {setores.map((setor) => (
+              <SelectItem key={setor.id} value={setor.id}>
+                {setor.nome ?? "(sem nome)"}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
         <div className="ml-auto flex flex-row gap-2">
