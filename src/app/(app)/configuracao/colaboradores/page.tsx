@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { listaColaboradores } from "@/server/colaboradores/lista-colaboradores";
+import { EstadoCivil, TipoUsuario } from "@prisma/client";
 import { Pencil, Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -30,11 +31,11 @@ export default function Colaboradores() {
       email: string | null;
       status: boolean | null;
       dataNascimento: Date | null;
-      estadoCivil: string | null;
-      tipo: string | null;
+      estadoCivil: EstadoCivil | null;
+      tipo: TipoUsuario | null;
       setor: {
         id: string;
-        nome: string;
+        nome: string | null;
       } | null;
     }[]
   >([]);
@@ -67,7 +68,7 @@ export default function Colaboradores() {
 
         <div className="ml-auto flex flex-row gap-2">
           <Button className="cursor-pointer bg-black text-white hover:bg-indigo-900 ml-auto">
-            <Link href="#">
+            <Link href="/configuracao/colaboradores/criar-colaborador">
               <div className="flex items-center gap-2">
                 <Plus />
                 Novo Colaborador
@@ -100,7 +101,10 @@ export default function Colaboradores() {
                 </TableCell>
                 <TableCell>{colaborador.tipo}</TableCell>
                 <TableCell>
-                  <Link href={`#`} className="cursor-pointer">
+                  <Link
+                    href={`/configuracao/colaboradores/update-colaborador/${colaborador.id}`}
+                    className="cursor-pointer"
+                  >
                     <Pencil />
                   </Link>
                 </TableCell>

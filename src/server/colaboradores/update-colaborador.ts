@@ -8,6 +8,7 @@ export default async function prismaAtualizaColaborador({
   rg,
   email,
   status,
+  celular,
   dataNascimento,
   estadoCivil,
   tipo,
@@ -19,6 +20,7 @@ export default async function prismaAtualizaColaborador({
   rg: string;
   email: string;
   status: boolean;
+  celular: string;
   dataNascimento: Date;
   estadoCivil: EstadoCivil;
   tipo: TipoUsuario;
@@ -34,6 +36,7 @@ export default async function prismaAtualizaColaborador({
       rg,
       email,
       status,
+      celular,
       dataNascimento,
       estadoCivil,
       tipo,
