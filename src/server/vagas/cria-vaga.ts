@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { StatusVaga } from "@prisma/client";
 
 export default async function prismaCriaVaga({
   nome,
@@ -13,7 +14,7 @@ export default async function prismaCriaVaga({
 }: {
   nome: string;
   descricao: string;
-  status: boolean;
+  status: StatusVaga;
   setorId: string;
   dataCriacao: Date;
   dataFinalizacao: Date;
