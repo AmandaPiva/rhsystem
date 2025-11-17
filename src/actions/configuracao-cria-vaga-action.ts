@@ -9,8 +9,8 @@ interface IConfiguracaoCriaVagaAction {
   status: StatusVaga;
   setorId: string;
   dataCriacao: Date;
-  dataFinalizacao: Date;
-  dataEntradaDoCandidato: Date | null;
+  //dataFinalizacao: Date;
+  //dataEntradaDoCandidato: Date | null;
 }
 
 export default async function configuracaoCriaVagaAction({
@@ -19,17 +19,17 @@ export default async function configuracaoCriaVagaAction({
   status,
   setorId,
   dataCriacao,
-  dataFinalizacao,
-  dataEntradaDoCandidato,
-}: IConfiguracaoCriaVagaAction) {
+}: // dataFinalizacao,
+//dataEntradaDoCandidato,
+IConfiguracaoCriaVagaAction) {
   const vagaId = await prismaCriaVaga({
     nome,
     descricao,
     status,
     setorId,
     dataCriacao,
-    dataFinalizacao,
-    dataEntradaDoCandidato,
+    //dataFinalizacao,
+    //dataEntradaDoCandidato,
   });
 
   return vagaId;

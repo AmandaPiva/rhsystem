@@ -9,7 +9,12 @@ export async function listaVagas() {
       nome: true,
       descricao: true,
       status: true,
-      setorId: true,
+      setor: {
+        select: {
+          id: true,
+          nome: true,
+        },
+      },
       dataCriacao: true,
       dataFinalizacao: true,
       dataEntradaDoCandidato: true,

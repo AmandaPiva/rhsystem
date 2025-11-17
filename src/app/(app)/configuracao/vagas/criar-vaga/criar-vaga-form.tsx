@@ -1,5 +1,6 @@
 "use client";
 
+import configuracaoCriaVagaAction from "@/actions/configuracao-cria-vaga-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { listaSetores } from "@/server/setores/lista-setores";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { StatusVaga } from "@prisma/client";
 import { AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -29,6 +32,7 @@ const formSchema = z.object({
   nome: z.string().min(1, { message: "Nome é obrigatório" }),
   descricao: z.string().min(1, { message: "Descrição é obrigatória" }),
   setor: z.string().min(1, { message: "Setor é obrigatório" }),
+  status: z.nativeEnum(StatusVaga).default(StatusVaga.ABERTA),
 });
 type FormData = z.infer<typeof formSchema>;
 
@@ -38,6 +42,7 @@ export default function CriarVagaForm() {
   const [setores, setSetores] = useState<
     { id: string; nome: string | null; descricao: string | null }[]
   >([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchSetores() {
@@ -48,9 +53,32 @@ export default function CriarVagaForm() {
     fetchSetores();
   }, []);
 
-  const form = useForm<FormData>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
   });
+
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const vagaId = await configuracaoCriaVagaAction({
+        nome: data.nome,
+        descricao: data.descricao,
+        status: data.status,
+        setorId: data.setor,
+        dataCriacao: new Date(),
+      });
+
+      if (vagaId) {
+        router.push("#");
+      }
+    } catch (err) {
+      setError("Erro ao criar vaga. Por favor, tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="aling-center flex flex-col items-center justify-center mt-10">
@@ -69,7 +97,7 @@ export default function CriarVagaForm() {
         )}
 
         <form
-          //onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit)}
           className="mt-8 flex flex-col w-[90%]"
         >
           <FormField

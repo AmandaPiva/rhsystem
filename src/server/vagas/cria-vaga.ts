@@ -9,16 +9,16 @@ export default async function prismaCriaVaga({
   status,
   setorId,
   dataCriacao,
-  dataFinalizacao,
-  dataEntradaDoCandidato,
-}: {
+}: // dataFinalizacao,
+// dataEntradaDoCandidato,
+{
   nome: string;
   descricao: string;
   status: StatusVaga;
   setorId: string;
   dataCriacao: Date;
-  dataFinalizacao: Date;
-  dataEntradaDoCandidato: Date | null;
+  // dataFinalizacao: Date;
+  // dataEntradaDoCandidato: Date | null;
 }) {
   const vaga = await prisma.vagas.create({
     data: {
@@ -27,8 +27,8 @@ export default async function prismaCriaVaga({
       status,
       setorId,
       dataCriacao,
-      dataFinalizacao,
-      dataEntradaDoCandidato,
+      // dataFinalizacao,
+      // dataEntradaDoCandidato,
     },
   });
   return vaga.id;

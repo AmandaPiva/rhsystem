@@ -91,7 +91,6 @@ export default function CriaColaboradoresForm() {
     setError(null);
 
     try {
-      console.log("cheguei aqui");
       const colaboradorId = await configuracaoCriaColaboradorAction({
         nome: data.nome,
         cpf: data.cpf,
