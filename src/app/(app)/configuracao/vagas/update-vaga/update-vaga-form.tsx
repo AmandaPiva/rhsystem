@@ -1,6 +1,7 @@
 "use client";
 
-import configuracaoCriaVagaAction from "@/actions/configuracao-cria-vaga-action";
+import configuracaoBuscaVagaAction from "@/actions/configuracao-busca-vaga-action";
+import configuracaoUpdateVagaAction from "@/actions/configuracao-update-vaga-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,9 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { listaSetores } from "@/server/setores/lista-setores";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { StatusVaga } from "@prisma/client";
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,66 +31,75 @@ const formSchema = z.object({
   nome: z.string().min(1, { message: "Nome é obrigatório" }),
   descricao: z.string().min(1, { message: "Descrição é obrigatória" }),
   setor: z.string().min(1, { message: "Setor é obrigatório" }),
-  status: z.nativeEnum(StatusVaga).default(StatusVaga.ABERTA),
 });
 type FormData = z.infer<typeof formSchema>;
 
-export default function CriarVagaForm() {
-  const [error, setError] = useState<string | null>(null);
+export default function UpdateVagaForm({ vagaId }: { vagaId: string }) {
   const [loading, setLoading] = useState(false);
-  const [setores, setSetores] = useState<
-    { id: string; nome: string | null; descricao: string | null }[]
-  >([]);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchSetores() {
-      const setores = await listaSetores();
-      setSetores(setores);
-    }
-
-    fetchSetores();
-  }, []);
-
-  const form = useForm({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: FormData) => {
+  useEffect(() => {
+    async function fetchVaga() {
+      try {
+        const vaga = await configuracaoBuscaVagaAction({ vagaId });
+        if (vaga) {
+          form.reset({
+            nome: vaga.nome ?? "",
+            descricao: vaga.descricao ?? "",
+            setor: vaga.setorId ?? "",
+          });
+        } else {
+          setError("Vaga não encontrada");
+        }
+      } catch (error) {
+        setError("Erro ao buscar vaga");
+      }
+    }
+    if (vagaId) {
+      fetchVaga();
+    }
+  }, [vagaId, form]);
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setLoading(true);
-    setError(null);
+
+    const { nome, descricao, setor } = data;
 
     try {
-      const vagaId = await configuracaoCriaVagaAction({
-        nome: data.nome,
-        descricao: data.descricao,
-        status: data.status,
-        setorId: data.setor,
-        dataCriacao: new Date(),
+      await configuracaoUpdateVagaAction({
+        id: vagaId,
+        nome,
+        descricao,
+        setorId: setor,
+        dataFinalizacao: null,
       });
-
-      if (vagaId) {
-        router.push("/configuracao/vagas");
+      router.push("/configuracao/vagas");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Erro ao atualizar vaga");
       }
-    } catch (err) {
-      setError("Erro ao criar vaga. Por favor, tente novamente.");
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
     <div className="aling-center flex flex-col items-center justify-center mt-10">
-      <h1 className="text-2xl font-bold text-indigo-900">Cadastro da vaga</h1>
-      <p className="text-gray-500">
-        Preencha os campos abaixo para criar uma nova vaga
-      </p>
+      <h1 className="text-2xl font-bold text-indigo-900">
+        Atualização da vaga
+      </h1>
 
       <Form {...form}>
         {error && (
           <Alert variant="destructive" className="mt-4 w-[400px]">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erro ao criar setor</AlertTitle>
+            <AlertTitle>Erro ao atualizar vaga</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -133,27 +141,6 @@ export default function CriarVagaForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="setor"
-            render={({ field }) => (
-              <FormItem>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-50 mt-5">
-                    <SelectValue placeholder="Setor da vaga" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {setores.map((setor) => (
-                      <SelectItem key={setor.id} value={setor.id}>
-                        {setor.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <div className="flex justify-center mx-auto w-[30%]">
             <Button
@@ -161,7 +148,7 @@ export default function CriarVagaForm() {
               disabled={loading}
               className="mx-auto mt-8 bg-gray-800 cursor-pointer w-[70%]"
             >
-              {loading ? "Criando..." : "Criar Vaga"}
+              {loading ? "Atualizando..." : "Atualizar Vaga"}
             </Button>
           </div>
         </form>

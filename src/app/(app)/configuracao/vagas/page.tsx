@@ -1,6 +1,8 @@
 "use client";
 
+import configuracaoDeleteVagaAction from "@/actions/configuracao-delete-vaga-action";
 import configuracaoMudaStatusVagaAction from "@/actions/configuracao-muda-status-vaga-action";
+import configuracaoUpdateVagaAction from "@/actions/configuracao-update-vaga-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +30,7 @@ import { listaVagas } from "@/server/vagas/lista-vagas";
 import { StatusVaga } from "@prisma/client";
 import { Dialog } from "@radix-ui/react-dialog";
 import { SelectTrigger } from "@radix-ui/react-select";
-import { Plus, Trash } from "lucide-react";
+import { PencilLine, Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -55,21 +57,62 @@ export default function Vagas() {
     fetchVagas();
   }, []);
 
+  function getBadgeClass(status?: StatusVaga | null) {
+    switch (status) {
+      case "ABERTA":
+        return "bg-emerald-500 text-white";
+      case "PREENCHIDA":
+        return "bg-indigo-500 text-white";
+      case "FECHADA":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-gray-400 text-white";
+    }
+  }
+
   async function handleStatusChange(vagaId: string, novoStatus: StatusVaga) {
     try {
       const statusVagaModificado = await configuracaoMudaStatusVagaAction({
         id: vagaId,
         status: novoStatus,
       });
+
+      if (novoStatus === "FECHADA" || novoStatus === "PREENCHIDA") {
+        try {
+          const dataFechamento = new Date();
+          const vaga = vagas.find((v) => v.id === vagaId);
+          if (vaga) {
+            await configuracaoUpdateVagaAction({
+              id: vagaId,
+              nome: vaga.nome,
+              descricao: vaga.descricao,
+              setorId: vaga.setor?.id,
+              dataFinalizacao: dataFechamento,
+            });
+          }
+        } catch (err) {
+          console.error("Erro ao gravar data de fechamento:", err);
+        }
+      }
+
       setVagas((prev) =>
         prev.map((v) =>
           v.id === vagaId
             ? { ...v, status: statusVagaModificado?.status ?? novoStatus }
-            : v
-        )
+            : v,
+        ),
       );
     } catch (error) {
       console.error("Erro ao alterar status da vaga:", error);
+    }
+  }
+
+  async function handleDeleteVaga(vagaId: string) {
+    try {
+      await configuracaoDeleteVagaAction({ id: vagaId });
+      setVagas((prev) => prev.filter((v) => v.id !== vagaId));
+    } catch (error) {
+      console.error("Erro ao deletar vaga:", error);
     }
   }
 
@@ -78,7 +121,7 @@ export default function Vagas() {
       <h1 className="text-2xl font-bold text-center text-indigo-900 mt-10">
         Configuração de Vagas
       </h1>
-      <p className="text-center text-gray-500">Gerencie os vagas da empresa</p>
+      <p className="text-center text-gray-500">Gerencie as vagas da empresa</p>
 
       <div className="w-[90%] flex flex-row gap-2 mt-10 mx-auto">
         <Button className="cursor-pointer bg-black text-white hover:bg-indigo-900 ml-auto">
@@ -103,7 +146,9 @@ export default function Vagas() {
                 </Label>
                 <Label htmlFor="title">Setor: {vaga.setor?.nome}</Label>
                 <div className="flex flex-row gap-4">
-                  <Badge className="mt-4 bg-emerald-500">{vaga.status}</Badge>
+                  <Badge className={`mt-4 ${getBadgeClass(vaga.status)}`}>
+                    {vaga.status}
+                  </Badge>
                   <div className="ml-auto"></div>
                   <Dialog>
                     <DialogTrigger>
@@ -125,7 +170,9 @@ export default function Vagas() {
                           {vaga.dataCriacao?.toLocaleDateString()}
                         </DialogDescription>
                         <DialogDescription>
-                          <Badge className="mt-4 bg-emerald-500">
+                          <Badge
+                            className={`mt-4 ${getBadgeClass(vaga.status)}`}
+                          >
                             {vaga.status}
                           </Badge>
                         </DialogDescription>
@@ -154,10 +201,18 @@ export default function Vagas() {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-
-                  <Button className="cursor-pointer bg-red-500 text-white hover:bg-indigo-900 ">
+                  <Button
+                    onClick={() => handleDeleteVaga(vaga.id)}
+                    className="cursor-pointer bg-red-500 text-white hover:bg-indigo-900 "
+                  >
                     <Trash />
                   </Button>
+                  <Link
+                    href={`/configuracao/vagas/update-vaga/${vaga.id}`}
+                    className="cursor-pointer mt-2"
+                  >
+                    <PencilLine />
+                  </Link>
                 </div>
               </>
             </CardHeader>
