@@ -85,6 +85,17 @@ model Vagas {
   dataEntradaDoCandidato DateTime?
 }
 
+model Endereco {
+  id          String   @id @default(cuid())
+  rua         String?
+  numero      Int?
+  bairro      String?
+  cidade      String?
+  estado      String?
+  cep         Int?
+  candidatos  Candidatos[]
+}
+
 model Candidatos {
   id          String   @id @default(cuid())
   nome        String?
@@ -92,10 +103,14 @@ model Candidatos {
   rg          String?  @unique
   celular     String?
   email       String?  @unique
+  dataNascimento DateTime?
   status      Boolean? @default(true)
   vagaId      String?
   vaga        Vagas?   @relation(fields: [vagaId], references: [id])
   etapa       EtapasProcessoSeletivo?
+  enderecoId  String?
+  endereco     Endereco? @relation(fields: [enderecoId], references: [id])
+ 
 }
 
 model Ferias {
