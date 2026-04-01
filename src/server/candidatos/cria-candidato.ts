@@ -16,7 +16,7 @@ export default async function prismaCriaCandidato({
   rg: string;
   celular: string;
   email: string;
-  dataNascimento: string;
+  dataNascimento: Date;
   enderecoId: string;
 }) {
   const candidato = await prisma.candidatos.create({
