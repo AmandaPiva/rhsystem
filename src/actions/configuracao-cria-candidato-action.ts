@@ -1,6 +1,7 @@
 "use server";
 
 import prismaCriaCandidato from "@/server/candidatos/cria-candidato";
+import { EtapasProcessoSeletivo } from "@prisma/client";
 
 interface IConfigurationCriaCandidatoAction {
   nome: string;
@@ -9,7 +10,9 @@ interface IConfigurationCriaCandidatoAction {
   email: string;
   celular: string;
   dataNascimento: Date;
+  etapa: EtapasProcessoSeletivo;
   enderecoId: string;
+  vagaId?: string;
 }
 
 export default async function configuracaoCriaCandidatoAction({
@@ -19,7 +22,9 @@ export default async function configuracaoCriaCandidatoAction({
   email,
   celular,
   dataNascimento,
+  etapa,
   enderecoId,
+  vagaId,
 }: IConfigurationCriaCandidatoAction) {
   const candidatoId = await prismaCriaCandidato({
     nome,
@@ -28,7 +33,9 @@ export default async function configuracaoCriaCandidatoAction({
     email,
     celular,
     dataNascimento,
+    etapa,
     enderecoId,
+    vagaId,
   });
 
   return candidatoId;

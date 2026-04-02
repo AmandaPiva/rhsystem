@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Console } from "console";
+import { EtapasProcessoSeletivo } from "@prisma/client";
 import { AlertCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -47,6 +47,8 @@ export default function CriarCandidatoForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const vagaId = searchParams.get("vagaId") ?? undefined;
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -83,7 +85,9 @@ export default function CriarCandidatoForm() {
         celular: data.celular,
         email: data.email,
         dataNascimento: new Date(data.dataNascimento),
+        etapa: EtapasProcessoSeletivo.TRIAGEM,
         enderecoId: enderecoId || "",
+        vagaId,
       });
 
       if (candidatoId) {
