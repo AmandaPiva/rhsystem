@@ -92,6 +92,9 @@ export default function CriarCandidatoForm() {
 
       if (candidatoId) {
         console.log("Candidato criado com ID:", candidatoId);
+        router.push(
+          `/configuracao/candidatos/upload-curriculo?candidatoId=${candidatoId}`,
+        );
       }
     } catch (err) {
       setError("Erro ao criar candidato. Tente novamente.");
