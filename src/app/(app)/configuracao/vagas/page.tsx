@@ -196,7 +196,11 @@ export default function Vagas() {
                           </SelectContent>
                         </Select>
                         <Button className="cursor-pointer bg-black text-white hover:bg-indigo-900 ">
-                          Ver Candidatos
+                          <Link
+                            href={`/configuracao/candidatos/listar-candidatos-vaga?vagaId=${vaga.id}`}
+                          >
+                            Ver Candidatos
+                          </Link>
                         </Button>
                       </DialogFooter>
                     </DialogContent>
