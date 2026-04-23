@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import prismaBuscaCandidatoPelaVaga from "@/server/candidatos/buscar-candidato-pela-vaga";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -74,7 +75,11 @@ export default function ListarCandidatosVaga() {
                 <TableCell>{candidato.etapa ?? "N/A"}</TableCell>
                 <TableCell>
                   <Button className="cursor-pointer bg-black text-white hover:bg-indigo-900 ">
-                    Ver Detalhes
+                    <Link
+                      href={`/configuracao/candidatos/infos-candidatos?candidatoId=${candidato.id}`}
+                    >
+                      Ver Detalhes
+                    </Link>
                   </Button>
                 </TableCell>
               </TableRow>
