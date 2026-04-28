@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "env:load": "dotenv -e ./.env --",
-    "db:migrate": "pnpm env:load prisma migrate dev",
-    "db:studio": "pnpm env:load prisma studio"
+    "migrate:local": "dotenv -e .env.local -- prisma migrate dev",
+    "migrate:supabase": "dotenv -e .env.migrate -- prisma migrate dev",
+    "studio:local": "dotenv -e .env.local -- prisma studio",
+    "studio:supabase": "dotenv -e .env.migrate -- prisma studio"
   },
   "dependencies": {
     "@prisma/client": "6.8.0",
@@ -26,7 +27,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "dotenv-cli": "^8.0.0",
     "lucide": "^0.511.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.2",
@@ -45,6 +45,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8.5.3",

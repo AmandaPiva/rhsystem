@@ -110,7 +110,16 @@ model Candidatos {
   etapa       EtapasProcessoSeletivo?
   enderecoId  String?
   endereco     Endereco? @relation(fields: [enderecoId], references: [id])
- 
+  curriculo    Curriculo[]
+}
+
+model Curriculo {
+  id           String   @id @default(cuid())
+  nome         String
+  path         String
+  candidatoId  String
+  candidato    Candidatos? @relation(fields: [candidatoId], references: [id])
+  createdAt    DateTime @default(now())
 }
 
 model Ferias {
