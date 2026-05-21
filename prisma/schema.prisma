@@ -116,7 +116,7 @@ model Candidatos {
 model Curriculo {
   id           String   @id @default(cuid())
   nome         String
-  path         String
+  url           String
   candidatoId  String
   candidato    Candidatos? @relation(fields: [candidatoId], references: [id])
   createdAt    DateTime @default(now())
