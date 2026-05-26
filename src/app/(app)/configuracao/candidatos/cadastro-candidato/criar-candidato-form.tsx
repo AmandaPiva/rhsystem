@@ -47,6 +47,7 @@ export default function CriarCandidatoForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
   const searchParams = useSearchParams();
   const vagaId = searchParams.get("vagaId") ?? undefined;
 
@@ -78,13 +79,18 @@ export default function CriarCandidatoForm() {
         });
       }
 
+      const nascimento = (() => {
+        const [y, m, d] = data.dataNascimento.split("-").map(Number);
+        return new Date(y, m - 1, d);
+      })();
+
       const candidatoId = await configuracaoCriaCandidatoAction({
         nome: data.nome,
         cpf: data.cpf,
         rg: data.rg,
         celular: data.celular,
         email: data.email,
-        dataNascimento: new Date(data.dataNascimento),
+        dataNascimento: nascimento,
         etapa: EtapasProcessoSeletivo.TRIAGEM,
         enderecoId: enderecoId || "",
         vagaId,

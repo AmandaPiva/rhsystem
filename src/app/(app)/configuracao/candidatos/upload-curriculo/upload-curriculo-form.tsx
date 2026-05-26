@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Paperclip, Loader2 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import configuracaoCriaCurriculoAction from "@/actions/configuracao-cria-curriculo-action";
-import router from "next/router";
 
 export default function UploadCurriculoForm() {
   const searchParams = useSearchParams();
@@ -14,6 +13,7 @@ export default function UploadCurriculoForm() {
 
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleUpload() {
     try {
@@ -33,7 +33,7 @@ export default function UploadCurriculoForm() {
         file: arquivo,
         candidatoId,
       });
-
+      console.log(response);
       if (!response.success) {
         alert(response.message);
         return;

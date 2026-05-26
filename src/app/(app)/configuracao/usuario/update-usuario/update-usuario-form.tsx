@@ -59,7 +59,11 @@ export default function UpdateUsuarioForm({ userId }: { userId: string }) {
           form.reset({
             nome: usuario.nome ?? "",
             email: usuario.email ?? "",
-            tipoUsuario: usuario.tipo ?? "USUARIO",
+            // Map server TipoUsuario to form's expected union (ADMIN | USUARIO)
+            tipoUsuario:
+              usuario.tipo === "ADMIN" ? "ADMIN" : usuario.tipo === "USUARIO" ? "USUARIO" : "USUARIO",
+            // default funcionario to "nao" if not provided
+            funcionario: (usuario as any)?.funcionario === "sim" ? "sim" : "nao",
           });
         } else {
           setError("Usuário não encontrado");
@@ -83,10 +87,10 @@ export default function UpdateUsuarioForm({ userId }: { userId: string }) {
     try {
       await configuracaoUpdateUsuarioAction({
         id: userId,
-        nome,
-        email,
+        nome: nome || "",
+        email: email || "",
         status: true,
-        tipoUsuario: tipoUser,
+        tipoUsuario: tipoUser || null,
       });
       console.log("Usuário atualizado com sucesso");
       router.push("/configuracao/usuario");
@@ -195,9 +199,10 @@ export default function UpdateUsuarioForm({ userId }: { userId: string }) {
                 />
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="ml-5 bg-gray-800 cursor-pointer"
                 >
-                  Atualizar
+                  {loading ? "Atualizando..." : "Atualizar"}
                 </Button>
               </div>
             </form>

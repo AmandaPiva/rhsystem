@@ -1,9 +1,25 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import prismaBuscaCandidato from "@/server/candidatos/buscar-candidato";
+import configuracaoMudaEtapaCandidatoAction from "@/actions/configuracao-muda-etapa-candidato-action";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+
+const etapas = [
+  { value: "TRIAGEM", label: "Triagem" },
+  { value: "ENTREVISTA", label: "Entrevista" },
+  { value: "TESTES", label: "Testes" },
+  { value: "AVALIACAO", label: "Avaliação" },
+  { value: "CONTRATACAO", label: "Contratação" },
+] as const;
 
 export default function InformacoesCandidatos() {
   const [candidato, setCandidato] = useState<{
@@ -17,6 +33,10 @@ export default function InformacoesCandidatos() {
     status: boolean | null;
     etapa: string | null;
   }>();
+  const [selectedEtapa, setSelectedEtapa] = useState<string>("");
+  const [loadingEtapa, setLoadingEtapa] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const candidatoId = searchParams.get("candidatoId") ?? undefined;
@@ -28,10 +48,36 @@ export default function InformacoesCandidatos() {
         valor: candidatoId ?? "",
       });
       setCandidato(candidato);
+      setSelectedEtapa(candidato?.etapa ?? "");
     }
 
     fetchCandidatos();
   }, [candidatoId]);
+
+  async function handleChangeEtapa(value: string) {
+    setMessage(null);
+    setError(null);
+    setSelectedEtapa(value);
+
+    if (!candidato) {
+      return;
+    }
+
+    setLoadingEtapa(true);
+    try {
+      const updatedCandidato = await configuracaoMudaEtapaCandidatoAction({
+        id: candidato.id,
+        etapa: value as any,
+      });
+      setCandidato(updatedCandidato);
+      setMessage("Etapa atualizada com sucesso.");
+    } catch (err) {
+      setError("Não foi possível atualizar a etapa. Tente novamente.");
+      setSelectedEtapa(candidato.etapa ?? "");
+    } finally {
+      setLoadingEtapa(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -114,13 +160,34 @@ export default function InformacoesCandidatos() {
 
           <div className="md:col-span-2">
             <label className="text-sm text-gray-500">Etapa</label>
-            <Input
-              readOnly
-              value={candidato?.etapa ?? ""}
-              className="mt-1 bg-gray-100 border-none"
-            />
+            <Select
+              value={selectedEtapa}
+              onValueChange={handleChangeEtapa}
+              disabled={!candidato || loadingEtapa}
+            >
+              <SelectTrigger className="w-full mt-1">
+                <SelectValue placeholder="Selecione a etapa" />
+              </SelectTrigger>
+              <SelectContent>
+                {etapas.map((etapa) => (
+                  <SelectItem key={etapa.value} value={etapa.value}>
+                    {etapa.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
+
+        {(message || error) && (
+          <div className="mt-4 rounded-md px-4 py-3 text-sm">
+            {message ? (
+              <div className="text-green-700 bg-green-100">{message}</div>
+            ) : (
+              <div className="text-red-700 bg-red-100">{error}</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
