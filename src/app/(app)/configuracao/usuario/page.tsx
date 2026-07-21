@@ -66,7 +66,6 @@ export default function Usuarios() {
               <TableHead className="font-bold">Email</TableHead>
               <TableHead className="font-bold">Status</TableHead>
               <TableHead className="font-bold">Tipo de Usuário</TableHead>
-              <TableHead className="font-bold">Ações</TableHead>
               <TableHead className="font-bold">Editar</TableHead>
             </TableRow>
           </TableHeader>
@@ -89,10 +88,6 @@ export default function Usuarios() {
                     <TableCell>
                       {usuario.tipo === "ADMIN" ? "Admin" : "Usuário"}
                     </TableCell>
-
-                    <TableCell>
-                      <Button className="cursor-pointer">Detalhes</Button>
-                    </TableCell>
                     <TableCell>
                       <Link
                         href={`/configuracao/usuario/update-usuario/${usuario.id}`}
@@ -103,7 +98,7 @@ export default function Usuarios() {
                     </TableCell>
                   </TableRow>
                 )
-              )
+              ),
             )}
           </TableBody>
         </Table>

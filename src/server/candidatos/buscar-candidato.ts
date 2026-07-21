@@ -16,6 +16,9 @@ export default async function prismaBuscaCandidato({
     where: {
       [pelo]: valor,
     },
+    include: {
+      curriculo: true,
+    },
   });
 
   return candidato;

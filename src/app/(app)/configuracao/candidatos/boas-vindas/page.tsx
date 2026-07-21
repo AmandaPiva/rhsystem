@@ -10,12 +10,10 @@ export default function BoasVindasCandidatoProcessoSeletivo() {
         Estamos felizes em tê-lo conosco. Agradecemos por se candidatar e
         estamos ansiosos para conhecer mais sobre você.
       </p>
-
-      <div className="flex justify-center mx-auto w-[30%] mt-8">
-        <Button className="cursor-pointer">
-          Detalhes do processo seletivo
-        </Button>
-      </div>
+      <p className="text-lg text-center text-gray-500 mt-4">
+        Fique atento às próximas etapas do processo seletivo, pois entraremos em
+        contato em breve com mais informações.
+      </p>
     </div>
   );
 }
