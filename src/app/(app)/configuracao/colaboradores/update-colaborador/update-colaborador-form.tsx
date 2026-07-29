@@ -36,6 +36,7 @@ import configuracaoUpdateColaboradorAction from "@/actions/configuracao-update-c
 import configuracaoBuscaColaboradorAction from "@/actions/configuracao-busca-colaborador-action";
 import { useRouter } from "next/navigation";
 import { listaSetores } from "@/server/setores/lista-setores";
+import Link from "next/link";
 
 const formSchema = z.object({
   nome: z.string().min(1).optional(),
@@ -379,6 +380,18 @@ export default function UpdateColaboradorForm({
                 </FormItem>
               )}
             />
+            <div>
+              <Button
+                disabled={loading}
+                className="mx-auto mt-8 bg-green-700 cursor-pointer w-[70%]"
+              >
+                <Link
+                  href={`/configuracao/ferias/adicionar-ferias/${colaboradorId}`}
+                >
+                  Adicionar Férias
+                </Link>
+              </Button>
+            </div>
           </div>
 
           <div className="flex justify-center mx-auto w-[30%]">

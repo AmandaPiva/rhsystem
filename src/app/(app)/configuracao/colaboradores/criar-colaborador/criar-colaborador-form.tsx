@@ -346,16 +346,6 @@ export default function CriaColaboradoresForm() {
               )}
             />
           </div>
-
-          <div className="flex justify-center mx-auto w-[30%]">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="mx-auto mt-8 bg-gray-800 cursor-pointer w-[70%]"
-            >
-              {loading ? "Cadastrando..." : "Cadastrar"}
-            </Button>
-          </div>
         </form>
       </Form>
     </div>
